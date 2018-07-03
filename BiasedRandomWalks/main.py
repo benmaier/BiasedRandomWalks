@@ -1,13 +1,13 @@
 import numpy as np
 import networkx as nx
 
-from BiasedRandomWalks import get_weight_matrix_and_minimal_distances,
-                              get_biased_transition_matrix,
-                              get_transient_matrix_and_absorbing_matrix,
-                              walkers_arriving_at_sink_nodes,
-                              get_full_biased_transition_matrix,
-                              get_full_weight_matrix_and_minimal_distances,
-                              walkers_arriving_at_nodes
+from BiasedRandomWalks import get_weight_matrix_and_minimal_distances
+from BiasedRandomWalks import get_biased_transition_matrix
+from BiasedRandomWalks import get_transient_matrix_and_absorbing_matrix
+from BiasedRandomWalks import walkers_arriving_at_sink_nodes
+from BiasedRandomWalks import get_full_biased_transition_matrix
+from BiasedRandomWalks import get_full_weight_matrix_and_minimal_distances
+from BiasedRandomWalks import walkers_on_nodes
 
 class BiasedRandomWalk():
 
@@ -44,7 +44,7 @@ class BiasedRandomWalk():
         self.adjacency_matrix, _ = get_full_weight_matrix_and_minimal_distances(
                                           self.G,
                                           self.sink_nodes,
-                                          self.use_inverse_distance_as_adjacency):
+                                          self.use_inverse_distance_as_adjacency)
 
         self.full_transition_matrix = get_full_biased_transition_matrix(self.adjacency_matrix, 
                                                                         self.bias,
@@ -62,9 +62,9 @@ class BiasedRandomWalk():
         return t, rho
 
     
-    def get_amount_of_walkers_arriving_at_nodes(self,initial_distribution_on_nodes,tmax):
+    def get_amount_of_walkers_on_nodes(self,initial_distribution_on_nodes,tmax):
 
-        t, rho = walkers_at_nodes(self.full_transition_matrix, initial_distribution_on_nodes, tmax)
+        t, rho = walkers_on_nodes(self.full_transition_matrix, initial_distribution_on_nodes, tmax)
 
         return t, rho
 
@@ -74,18 +74,7 @@ class BiasedRandomWalk():
 
         return t, np.cumsum(rho, axis=0)
 
-    def get_amount_of_walkers_arrived_at_nodes(self,initial_distribution_on_nodes,tmax):
 
-        t, rho = self.get_amount_of_walkers_arrived_at_sink_nodes(initial_distribution_on_transient_nodes,tmax)
-
-        return t, np.cumsum(rho, axis=0) 
-
-
-
-
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as pl
 
 
 

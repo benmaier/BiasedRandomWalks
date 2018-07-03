@@ -51,7 +51,7 @@ def get_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distance_as
 
     return W, min_distances
 
-def get_biased_transition_matrix(W, gamma, min_distances):
+def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential'):
     """
     Parameters
     ==========

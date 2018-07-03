@@ -29,6 +29,7 @@ def get_full_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distan
     """
 
     nodes = set(list(G.nodes()))
+    N = G.number_of_nodes()
     transient_nodes = list(nodes - set(sink_nodes))
     d = dict(nx.all_pairs_dijkstra_path_length(G))
     D = np.zeros((N,N))
@@ -48,7 +49,7 @@ def get_full_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distan
 
     return W, min_distances
 
-def walkers_arriving_at_nodes(T, walker_distribution_on_nodes, tmax, return_walker_distribution = False):
+def walkers_on_nodes(T, walker_distribution_on_nodes, tmax, return_walker_distribution = False):
     """
     Parameters
     ==========
@@ -72,11 +73,7 @@ def walkers_arriving_at_nodes(T, walker_distribution_on_nodes, tmax, return_walk
         the number of sink-nodes.
     """
     
-    # get number of sink nodes
-    s = R.shape[0]
-    
     # inital walker distribution
-    
     t = np.arange(tmax)
     p = walker_distribution_on_nodes.copy()
     rhos = [p]
@@ -119,7 +116,7 @@ def get_full_biased_transition_matrix(W, gamma, min_distances, sink_nodes, bias_
         next time step.
     """
     
-    nodes = set(list(G.nodes()))
+    nodes = set(range(W.shape[0]))
     transient_nodes = list(nodes - set(sink_nodes))  
     
     if bias_kind == 'exponential':

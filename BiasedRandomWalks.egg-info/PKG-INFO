@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: BiasedRandomWalks
+Version: 0.0.1
+Summary: Provides classes around biased random walks on networks.
+Home-page: https://www.github.com/benmaier/BiasedRandomWalks
+Author: Benjamin F. Maier
+Author-email: bfmaier@physik.hu-berlin.de
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
