@@ -29,10 +29,14 @@ def get_full_weight_matrix_and_minimal_distances(G,
 
     Returns
     =======
+    A : numpy.array
+        An (n x n)-matrix where m is the number of transient nodes and
+        n is the number of nodes. Each entry [i,j] is the distance
+        between i and j. Contains 0 if i and j are not connected.
     W : numpy.array
         An (n x n)-matrix where m is the number of transient nodes and
-        n is the number of nodes. Each entry [i,j] is the inverse distance
-        between i and j. Contains 0 if i and j are not connected.
+        n is the number of nodes. Each entry [i,j] is 1 if i and j
+        are connected and zero otherwise.
     min_distances : numpy.array
         A vector with n entries containing the distance of each
         node i to the _nearest_ sink (might be 0 if i is a sink).
@@ -53,17 +57,20 @@ def get_full_weight_matrix_and_minimal_distances(G,
             D[j,i] = d[j][i]
 
     A = nx.adjacency_matrix(G).toarray()
-    W = A.astype(float)
+    A = A.astype(float)
+    W = A.copy()
 
     if use_inverse_distance_as_adjacency:
         W[A>0] = 1/A[A>0]
+    else:
+        W[A>0] = 1
 
     min_distances = D[:,sink_nodes].min(axis=1)
 
     if return_distance_matrix:
-        return W, min_distances, D
+        return A, W, min_distances, D
     else:
-        return W, min_distances
+        return A, W, min_distances
 
 def walkers_on_nodes(T, walker_distribution_on_nodes, tmax, return_walker_distribution = False):
     """

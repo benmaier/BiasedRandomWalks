@@ -23,14 +23,14 @@ class BiasedRandomWalk():
 
     def compute_all_matrices(self):
 
-        self.adjacency_matrix_to_sinks, self.min_distances_to_sinks = \
+        self.weight_matrix_to_sinks, self.min_distances_to_sinks = \
                 get_weight_matrix_and_minimal_distances(
                                                         self.G,
                                                         self.sink_nodes,
                                                         self.use_inverse_distance_as_adjacency,
                                                         )
 
-        self.transition_matrix_to_sinks = get_biased_transition_matrix(self.adjacency_matrix_to_sinks,
+        self.transition_matrix_to_sinks = get_biased_transition_matrix(self.weight_matrix_to_sinks,
                                                                        self.bias,
                                                                        self.min_distances_to_sinks,
                                                                        self.bias_kind
@@ -41,14 +41,14 @@ class BiasedRandomWalk():
                                                   self.sink_nodes
                                                   )
 
-        self.adjacency_matrix, _, self.distance_matrix = get_full_weight_matrix_and_minimal_distances(
+        self.adjacency_matrix, self.weight_matrix, _, self.distance_matrix = get_full_weight_matrix_and_minimal_distances(
                                           self.G,
                                           self.sink_nodes,
                                           self.use_inverse_distance_as_adjacency,
                                           return_distance_matrix = True
                                           )
 
-        self.full_transition_matrix = get_full_biased_transition_matrix(self.adjacency_matrix, 
+        self.full_transition_matrix = get_full_biased_transition_matrix(self.weight_matrix, 
                                                                         self.bias,
                                                                         self.min_distances_to_sinks, 
                                                                         self.sink_nodes,
@@ -84,7 +84,7 @@ class BiasedRandomWalk():
         Pt = [ np.eye(N) ]
         
         T = self.full_transition_matrix
-        D = self.distance_matrix
+        D = self.adjacency_matrix # this contains the distances between nodes along edges
         PD = T*D
 
         expected_distance = [ np.zeros((len(self.sink_nodes),)) ]

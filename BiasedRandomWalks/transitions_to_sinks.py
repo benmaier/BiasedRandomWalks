@@ -42,6 +42,8 @@ def get_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distance_as
     W = A.astype(float)
     if use_inverse_distance_as_adjacency:
         W[A>0] = 1/A[A>0]
+    else:
+        W[A>0] = 1
 
     min_distances = D[:,sink_nodes].min(axis=1)
     mean_min_distance = np.mean(min_distances[transient_nodes])
