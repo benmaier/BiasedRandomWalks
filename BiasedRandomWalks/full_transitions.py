@@ -2,7 +2,11 @@ import numpy as np
 import networkx as nx
 
 
-def get_full_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distance_as_adjacency=False):
+def get_full_weight_matrix_and_minimal_distances(G,
+                                                 sink_nodes,
+                                                 use_inverse_distance_as_adjacency = False,
+                                                 return_distance_matrix = False,
+                                                ):
     """
     Get the inverse adjacency matrix and for each
     transient node the minimal distance to any of the sinks.
@@ -16,6 +20,12 @@ def get_full_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distan
         Contains the indices of sink nodes. It's probably good
         if this is sorted to avoid confusion about later mappings
         but it doesn't have to.
+    use_inverse_distance_as_adjacency : bool, default : False
+        If this is `True`, instead of the adjacency a_ij, the 
+        inverse adjacency a_ij^{-1} is returned.
+    return_distance_matrix : bool, default : False
+        Return the matrix containing the total distance between 
+        nodes all nodes i and j
 
     Returns
     =======
@@ -26,6 +36,9 @@ def get_full_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distan
     min_distances : numpy.array
         A vector with n entries containing the distance of each
         node i to the _nearest_ sink (might be 0 if i is a sink).
+    D : numpy.array
+        An (n x n)-matrix containing this total distances d_ij between any=
+        two nodes i and j.
     """
 
     nodes = set(list(G.nodes()))
@@ -47,7 +60,10 @@ def get_full_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distan
 
     min_distances = D[:,sink_nodes].min(axis=1)
 
-    return W, min_distances
+    if return_distance_matrix:
+        return W, min_distances, D
+    else:
+        return W, min_distances
 
 def walkers_on_nodes(T, walker_distribution_on_nodes, tmax, return_walker_distribution = False):
     """

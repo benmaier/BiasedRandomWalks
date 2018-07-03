@@ -41,10 +41,12 @@ class BiasedRandomWalk():
                                                   self.sink_nodes
                                                   )
 
-        self.adjacency_matrix, _ = get_full_weight_matrix_and_minimal_distances(
+        self.adjacency_matrix, _, self.distance_matrix = get_full_weight_matrix_and_minimal_distances(
                                           self.G,
                                           self.sink_nodes,
-                                          self.use_inverse_distance_as_adjacency)
+                                          self.use_inverse_distance_as_adjacency,
+                                          return_distance_matrix = True
+                                          )
 
         self.full_transition_matrix = get_full_biased_transition_matrix(self.adjacency_matrix, 
                                                                         self.bias,
@@ -73,6 +75,34 @@ class BiasedRandomWalk():
         t, rho = self.get_amount_of_walkers_arriving_at_sink_nodes(initial_distribution_on_transient_nodes,tmax)
 
         return t, np.cumsum(rho, axis=0)
+
+    def get_mean_traveled_distance_for_sink_nodes(self,initial_distribution_on_nodes,tmax):
+
+        p = initial_distribution_on_nodes / initial_distribution_on_nodes.sum()
+
+        N = self.G.number_of_nodes()
+        Pt = [ np.eye(N) ]
+        
+        T = self.full_transition_matrix
+        D = self.distance_matrix
+        PD = T*D
+
+        expected_distance = [ np.zeros((len(self.sink_nodes),)) ]
+
+        for t_all in range(1,tmax):
+            Pt.append( T.dot(Pt[-1]) )
+
+            this_matrix = np.zeros((N,N))
+
+            for t in range(t_all):
+                this_matrix += Pt[t].dot(PD).dot(Pt[-t])
+
+            d = this_matrix.dot(p)
+            d = d[self.sink_nodes]
+            expected_distance.append(d)
+
+        return np.array(expected_distance)
+
 
 
 
