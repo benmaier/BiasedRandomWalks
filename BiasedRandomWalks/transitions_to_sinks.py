@@ -86,9 +86,10 @@ def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential
         alpha = gamma**min_distances
     elif bias_kind == 'scalefree':
         assert(0 >= gamma) 
-        alpha = min_distances**gamma
-        if gamma == 0:
-            alpha[min_distances == 0.0] = 1
+        d = min_distances.copy()
+        d[min_distances == 0.0] = 1
+        alpha = d**gamma
+        #print(min_distances, gamma, min_distances**gamma)
     else:
         raise ValueError("Unknown bias_kind '" + str(bias_kind) + "', use 'exponential' or 'scalefree'")
     

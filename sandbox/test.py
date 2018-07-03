@@ -18,7 +18,7 @@ G.add_edge(2,3,weight=0.2)
 sink_nodes = [2,]
 
 # define bias
-gamma = 0.1
+gamma = -0.1
 
 # initial distribution on transient
 p0 = np.array([1,0,0])
@@ -27,7 +27,7 @@ p0 = np.array([1,0,0])
 p0_all = np.array([1,0,0,0])
 
 # initial base class (choose 'exponential' or 'scale free')
-RW = BiasedRandomWalk(G, gamma, sink_nodes, bias_kind = 'exponential')
+RW = BiasedRandomWalk(G, gamma, sink_nodes, bias_kind = 'scalefree')
 
 fig, ax = pl.subplots(2,2,figsize=(9,7))
 
