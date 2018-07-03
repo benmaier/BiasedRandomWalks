@@ -27,7 +27,7 @@ p0 = np.array([1,0,0])
 p0_all = np.array([1,0,0,0])
 
 # initial base class (choose 'exponential' or 'scale free')
-RW = BiasedRandomWalk(G, gamma, sink_nodes, bias_kind = 'scalefree', use_additional_adjacency_in_bias=False)
+RW = BiasedRandomWalk(G, gamma, sink_nodes, bias_kind = 'scalefree', use_additional_adjacency_in_bias=True)
 
 fig, ax = pl.subplots(2,2,figsize=(9,7))
 

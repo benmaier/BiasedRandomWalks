@@ -153,6 +153,7 @@ def get_full_biased_transition_matrix(W,
     d = min_distances
     
     if additional_distance_adjacency_bias is not None:
+        #print(additional_distance_adjacency_bias)
         d = additional_distance_adjacency_bias + d[:,None] 
     
     if bias_kind == 'exponential':
@@ -172,6 +173,8 @@ def get_full_biased_transition_matrix(W,
         T *= alpha
     else:
         T *= alpha[:,None]
+
+    #print(alpha.shape)
 
     k = T.sum(axis=0)
 
