@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='BiasedRandomWalks',
-      version='0.0.2',
+      version='0.0.3',
       description='Provides classes around biased random walks on networks.',
       url='https://www.github.com/benmaier/BiasedRandomWalks',
       author='Benjamin F. Maier',
