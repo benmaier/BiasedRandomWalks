@@ -18,7 +18,7 @@ G.add_edge(2,3,weight=0.2)
 sink_nodes = [2,]
 
 # define bias
-gamma = 1
+gamma = 1.0
 
 # initial distribution on transient
 p0 = np.array([1,0,0])
@@ -37,6 +37,7 @@ tmax = 10
 # ========== cdf on sinks =========
 t, rho = RW.get_amount_of_walkers_arrived_at_sink_nodes(p0,tmax)
 d_traveled = RW.get_mean_traveled_distance_for_sink_nodes(p0_all,tmax)
+print(d_traveled)
 
 for i_s, s in enumerate(sink_nodes):
     ax.step(d_traveled[:,i_s], rho[:,i_s], label='sink node '+ str(s),where='post')

@@ -18,7 +18,7 @@ G.add_edge(2,3,weight=0.2)
 sink_nodes = [2,]
 
 # define bias
-gamma = 1
+gamma = 0.1
 
 # initial distribution on transient
 p0 = np.array([1,0,0])
