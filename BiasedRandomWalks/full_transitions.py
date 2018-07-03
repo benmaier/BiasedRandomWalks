@@ -30,11 +30,11 @@ def get_full_weight_matrix_and_minimal_distances(G,
     Returns
     =======
     A : numpy.array
-        An (n x n)-matrix where m is the number of transient nodes and
+        An (n x n)-matrix where
         n is the number of nodes. Each entry [i,j] is the distance
         between i and j. Contains 0 if i and j are not connected.
     W : numpy.array
-        An (n x n)-matrix where m is the number of transient nodes and
+        An (n x n)-matrix where
         n is the number of nodes. Each entry [i,j] is 1 if i and j
         are connected and zero otherwise.
     min_distances : numpy.array
@@ -108,13 +108,18 @@ def walkers_on_nodes(T, walker_distribution_on_nodes, tmax, return_walker_distri
     return t, np.array(rhos)
 
 
-def get_full_biased_transition_matrix(W, gamma, min_distances, sink_nodes, bias_kind='exponential'):
+def get_full_biased_transition_matrix(W, 
+                                      gamma, 
+                                      min_distances, 
+                                      sink_nodes, 
+                                      bias_kind='exponential',
+                                      additional_distance_adjacency_bias = None
+                                      ):
     """
     Parameters
     ==========
     W : numpy.array
-        An (n x n)-matrix where m is the number of transient nodes and
-        n is the number of nodes. Each entry [i,j] is the inverse distance
+        An (n x n)-matrix where n is the number of nodes. Each entry [i,j] is 1 when they are connected
         between i and j. Contains 0 if i and j are not connected.
     gamma : float
         The strength of the bias towards nearest sink nodes with 0 <= gamma
@@ -130,6 +135,9 @@ def get_full_biased_transition_matrix(W, gamma, min_distances, sink_nodes, bias_
                         minimum distance to the sink node
         `scalefree` : The bias will be of form $d^\\gamma$ with d being the
                       minimum distance to the sink node
+    additional_distance_adjacency_bias : numpy.array, default : None
+        An (n x n)-matrix where n is the number of nodes. Each entry [i,j] is the distance
+        between i and j. Contains 0 if i and j are not connected.
         
     Returns
     =======
@@ -140,23 +148,31 @@ def get_full_biased_transition_matrix(W, gamma, min_distances, sink_nodes, bias_
     """
     
     nodes = set(range(W.shape[0]))
-    transient_nodes = list(nodes - set(sink_nodes))  
+    transient_nodes = list(nodes - set(sink_nodes))
+
+    d = min_distances
+    
+    if additional_distance_adjacency_bias is not None:
+        d = additional_distance_adjacency_bias + d[:,None] 
     
     if bias_kind == 'exponential':
         assert(0 < gamma and gamma <= 1) 
-        alpha = gamma**min_distances
+        alpha = gamma**d
     elif bias_kind == 'scalefree':
         assert(0 >= gamma) 
-        d = min_distances.copy()
-        d[min_distances == 0.0] = 1
+        d[d == 0.0] = 1
         alpha = d**gamma
     else:
         raise ValueError("Unknown bias_kind '" + str(bias_kind) + "', use 'exponential' or 'scalefree'")
-    
+
     T = W.copy()
-    
+
     #introduce bias
-    T *= alpha[:,None]
+    if additional_distance_adjacency_bias is not None:
+        T *= alpha
+    else:
+        T *= alpha[:,None]
+
     k = T.sum(axis=0)
 
     T /= k[None,:]

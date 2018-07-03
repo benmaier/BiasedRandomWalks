@@ -11,29 +11,37 @@ from BiasedRandomWalks import walkers_on_nodes
 
 class BiasedRandomWalk():
 
-    def __init__(self, G, bias, sink_nodes, use_inverse_distance_as_adjacency=False, bias_kind='exponential'):
+    def __init__(self, G, bias, sink_nodes, use_inverse_distance_as_adjacency=False, bias_kind='exponential', use_additional_adjacency_in_bias=False):
 
         self.use_inverse_distance_as_adjacency = use_inverse_distance_as_adjacency
         self.G = G
         self.sink_nodes = sink_nodes
         self.bias = bias
         self.bias_kind = bias_kind
+        self.use_adj_bias = use_additional_adjacency_in_bias
 
         self.compute_all_matrices()
 
     def compute_all_matrices(self):
 
-        self.weight_matrix_to_sinks, self.min_distances_to_sinks = \
+        self.weight_matrix_to_sinks, self.min_distances_to_sinks, self.adj_distance_to_sinks = \
                 get_weight_matrix_and_minimal_distances(
                                                         self.G,
                                                         self.sink_nodes,
                                                         self.use_inverse_distance_as_adjacency,
+                                                        True
                                                         )
+
+        if self.use_adj_bias:
+            A = self.adj_distance_to_sinks
+        else:
+            A = None
 
         self.transition_matrix_to_sinks = get_biased_transition_matrix(self.weight_matrix_to_sinks,
                                                                        self.bias,
                                                                        self.min_distances_to_sinks,
-                                                                       self.bias_kind
+                                                                       self.bias_kind,
+                                                                       A
                                                                        )
         self.transient_matrix, self.absorbing_matrix = \
                                           get_transient_matrix_and_absorbing_matrix(
@@ -48,11 +56,17 @@ class BiasedRandomWalk():
                                           return_distance_matrix = True
                                           )
 
+        if self.use_adj_bias:
+            A = self.adjacency_matrix
+        else:
+            A = None
+
         self.full_transition_matrix = get_full_biased_transition_matrix(self.weight_matrix, 
                                                                         self.bias,
                                                                         self.min_distances_to_sinks, 
                                                                         self.sink_nodes,
                                                                         self.bias_kind,
+                                                                        A,
                                                                         )
 
     def get_amount_of_walkers_arriving_at_sink_nodes(self,initial_distribution_on_transient_nodes,tmax):

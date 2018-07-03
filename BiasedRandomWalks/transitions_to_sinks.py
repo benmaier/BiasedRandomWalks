@@ -1,7 +1,7 @@
 import numpy as np
 import networkx as nx
 
-def get_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distance_as_adjacency=False):
+def get_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distance_as_adjacency=False,return_distance_adjacency_matrix=False):
     """
     Get the inverse adjacency matrix and for each
     transient node the minimal distance to any of the sinks.
@@ -51,9 +51,12 @@ def get_weight_matrix_and_minimal_distances(G,sink_nodes,use_inverse_distance_as
 
     W = W[:,transient_nodes]
 
-    return W, min_distances
+    if return_distance_adjacency_matrix:
+        return W, min_distances, A[:,transient_nodes]
+    else:
+        return W, min_distances
 
-def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential'):
+def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential', additional_distance_adjacency_bias = None):
     """
     Parameters
     ==========
@@ -71,6 +74,10 @@ def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential
                         minimum distance to the sink node
         `scalefree` : The bias will be of form $d^\\gamma$ with d being the
                       minimum distance to the sink node
+    additional_distance_adjacency_bias : numpy.array, default : None
+        An (n x n)-matrix where n is the number of nodes. Each entry [i,j] is the distance
+        between i and j. Contains 0 if i and j are not connected.
+        
 
     Returns
     =======
@@ -81,13 +88,17 @@ def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential
         next time step.
     """
 
+    d = min_distances
+    
+    if additional_distance_adjacency_bias is not None:
+        d = additional_distance_adjacency_bias + d[:,None] 
+
     if bias_kind == 'exponential':
         assert(0 < gamma and gamma <= 1) 
-        alpha = gamma**min_distances
+        alpha = gamma**d
     elif bias_kind == 'scalefree':
         assert(0 >= gamma) 
-        d = min_distances.copy()
-        d[min_distances == 0.0] = 1
+        d[d == 0.0] = 1
         alpha = d**gamma
         #print(min_distances, gamma, min_distances**gamma)
     else:
@@ -96,7 +107,12 @@ def get_biased_transition_matrix(W, gamma, min_distances, bias_kind='exponential
     T = W.copy()
 
     #introduce bias
-    T *= alpha[:,None]
+    #introduce bias
+    if additional_distance_adjacency_bias is not None:
+        T *= alpha
+    else:
+        T *= alpha[:,None]
+
     k = T.sum(axis=0)
 
     T /= k[None,:]
