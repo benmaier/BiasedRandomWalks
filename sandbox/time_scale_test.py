@@ -36,11 +36,15 @@ tmax = 10
 
 # ========== cdf on sinks =========
 t, rho = RW.get_amount_of_walkers_arrived_at_sink_nodes(p0,tmax)
-d_traveled = RW.get_mean_traveled_distance_for_sink_nodes(p0_all,tmax)
+d_traveled = RW.get_mean_traveled_distance_for_sink_nodes(p0_all,tmax,norm_distance=False)
+d_traveled_2 = RW.get_mean_traveled_distance_for_sink_nodes(p0_all,tmax,norm_distance=True)
 print(d_traveled)
 
 for i_s, s in enumerate(sink_nodes):
-    ax.step(d_traveled[:,i_s], rho[:,i_s], label='sink node '+ str(s),where='post')
+    #ax.step(d_traveled[:,i_s], rho[:,i_s], label='sink node '+ str(s),where='post')
+    #ax.step(d_traveled_2[:,i_s], rho[:,i_s], label='sink node '+ str(s),where='post')
+    ax.plot(d_traveled[:,i_s], rho[:,i_s], label='sink node '+ str(s))
+    ax.plot(d_traveled_2[:,i_s], rho[:,i_s], label='sink node '+ str(s))
 
 ax.legend()
 ax.set_xlabel('mean traveled distance')

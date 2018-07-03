@@ -76,7 +76,7 @@ class BiasedRandomWalk():
 
         return t, np.cumsum(rho, axis=0)
 
-    def get_mean_traveled_distance_for_sink_nodes(self,initial_distribution_on_nodes,tmax):
+    def get_mean_traveled_distance_for_sink_nodes(self,initial_distribution_on_nodes,tmax,norm_distance=True):
 
         p = initial_distribution_on_nodes / initial_distribution_on_nodes.sum()
 
@@ -90,16 +90,27 @@ class BiasedRandomWalk():
         expected_distance = [ np.zeros((len(self.sink_nodes),)) ]
 
         for t_all in range(1,tmax):
-            Pt.append( T.dot(Pt[-1]) )
 
             this_matrix = np.zeros((N,N))
 
             for t in range(t_all):
                 this_matrix += Pt[t].dot(PD).dot(Pt[-t])
 
+            Pt.append( T.dot(Pt[-1]) )
+
             d = this_matrix.dot(p)
+            #print(d[self.sink_nodes], norm, d[self.sink_nodes] / norm)
             d = d[self.sink_nodes]
-            expected_distance.append(d)
+            if norm_distance:
+                #print(t)
+                #print(Pt[-1],'\n',np.linalg.matrix_power(T,t_all))
+                norm = Pt[-1].dot(p)
+                norm = norm[self.sink_nodes]
+
+                norm[norm == 0] = 1.0
+
+                d /= norm
+            expected_distance.append(d+expected_distance[-1])
 
         return np.array(expected_distance)
 
